@@ -16,5 +16,5 @@
     "psr-4": {
       "ctaolee\\yii2-swoole\\": "yii2-swoole"
     }
-  },
+  }
 }
