@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ctaolee
- * Date: 2018/5/2
- * Time: 下午11:00
- */
 
-namespace app\swoole\src;
+namespace ctaolee\swoole\web;
 
 
 class Response extends \yii\web\Response

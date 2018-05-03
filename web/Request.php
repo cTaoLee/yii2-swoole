@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ctaolee
- * Date: 2018/4/27
- * Time: 下午11:27
- */
 
-namespace app\swoole\src;
+namespace ctaolee\swoole\web;
 
 use Yii;
 use yii\web\NotFoundHttpException;
