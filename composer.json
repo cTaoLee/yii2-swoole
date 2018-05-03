@@ -1,0 +1,27 @@
+{
+  "name": "ctaolee/yii2-swoole",
+  "description": "yii2-swoole",
+  "keywords":[ "yii2", "swoole" ],
+  "homepage": "https://github.com/ctaolee/yii2-swoole",
+  "type": "yii2-extension",
+  "license": "MIT",
+  "support": {
+    "source": "https://github.com/ctaolee/yii2-swoole"
+  },
+  "authors": [{
+      "name": "terry water",
+      "email": "zqy234@126.com"
+  }],
+  "minimum-stability": "stable",
+  "require": {
+    "yiisoft/yii2": ">=2.0.15.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "ctaolee\\": ""
+    }
+  },
+  "config": {
+    "process-timeout": 1800
+  }
+}
