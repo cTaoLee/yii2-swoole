@@ -9,19 +9,12 @@
     "source": "https://github.com/ctaolee/yii2-swoole"
   },
   "authors": [{
-      "name": "terry water",
-      "email": "zqy234@126.com"
+      "name": "ctaolee",
+      "email": "lict@szcoolfish.com"
   }],
-  "minimum-stability": "stable",
-  "require": {
-    "yiisoft/yii2": ">=2.0.15.1"
-  },
   "autoload": {
     "psr-4": {
-      "ctaolee\\": ""
+      "ctaolee\\yii2-swoole": "yii2-swoole"
     }
   },
-  "config": {
-    "process-timeout": 1800
-  }
 }
