@@ -12,13 +12,12 @@
       "name": "ctaolee",
       "email": "lict@szcoolfish.com"
   }],
-  "minimum-stability": "dev",
   "require": {
       "php": ">=7.0.0"
   },
   "autoload": {
     "psr-4": {
-      "ctaolee\\yii2-swoole\\": "yii2-swoole"
+      "ctaolee\\swoole\\": "yii2-swoole/"
     }
   }
 }
