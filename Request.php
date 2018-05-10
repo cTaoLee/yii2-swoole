@@ -1,6 +1,6 @@
 <?php
 
-namespace ctaolee\swoole\web;
+namespace ctaolee\swoole;
 
 use Yii;
 use yii\web\NotFoundHttpException;

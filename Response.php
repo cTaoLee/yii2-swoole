@@ -1,6 +1,6 @@
 <?php
 
-namespace ctaolee\swoole\web;
+namespace ctaolee\swoole;
 
 
 class Response extends \yii\web\Response
@@ -18,31 +18,20 @@ class Response extends \yii\web\Response
         if ($this->_headers) {
             foreach ($this->getHeaders() as $name => $values) {
                 $name = str_replace(' ', '-', ucwords(str_replace('-', ' ', $name)));
-                // set replace for first occurrence of header but false afterwards to allow multiple
-                $replace = true;
                 foreach ($values as $value) {
-                    header("$name: $value", $replace);
-                    $replace = false;
+                    $this->response->header($name, $value);
                 }
             }
         }
         $statusCode = $this->getStatusCode();
-        print_r($this->_headers);
         $this->response->status($statusCode);
     }
 
 
     function sendContent()
     {
-
         $this->response->end($this->content);
     }
 
-
-    function send()
-    {
-        print_r($this->data);
-        return parent::send();
-    }
 
 }
