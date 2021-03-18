@@ -44,7 +44,6 @@ class SwooleServer extends BaseObject
      * @param \Swoole\Http\Response $response
      */
     public function setAppRunEnv($app, $request, $response) {
-
         $app->request->setSwRequest($request);
         $app->response->setSwResponse($response);
 
@@ -56,6 +55,10 @@ class SwooleServer extends BaseObject
         foreach ($request->server as $k => $v) {
             $_SERVER[strtoupper($k)] = $v;
         }
+        foreach ($request->header as $k => $v) {
+            $_SERVER[ 'HTTP_' . strtoupper(str_replace([' ', '-'], ['_', '_'], $k))] = $v;
+        }
+
         // 设置请求头
         foreach ($request->header as $name => $value) {
             $app->request->getHeaders()->set($name, $value);
