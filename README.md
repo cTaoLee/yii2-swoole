@@ -9,7 +9,7 @@ defined('YII_ENV') or define('YII_ENV', 'dev');
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/vendor/yiisoft/yii2/Yii.php';
 
-$config = require __DIR__ . '/yii2/config/web.php';
+$config = require __DIR__ . '/config/web.php';
 
 $app = new ctaolee\swoole\Application($config);
 
@@ -20,3 +20,20 @@ $server = new ctaolee\swoole\SwooleServer();
 $server->run($app, '0.0.0.0', 9501, $swooleConfig);
 ```
 
+## 热重载
+需要安装 **inotify** 扩展，可以通过 **pecl** 来安装，同时需要添加类似以下配置
+```php
+$swooleConfig = [
+    // ... 其他配置
+    
+    'hot_reload' => true,                               // 开启热重载
+    'inotify_files' => [
+        __DIR__ . '/models',
+        __DIR__ . '/modules',
+        __DIR__ . '/config',
+    ],
+    'pid_file' => __DIR__ . '/runtime/swoole.pid',      // pid文件位置，必须配置
+    
+    
+];
+```

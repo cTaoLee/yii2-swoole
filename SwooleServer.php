@@ -1,6 +1,7 @@
 <?php
 namespace ctaolee\swoole;
 
+use Swoole\Process;
 use Swoole\Http\Server;
 use yii\base\BaseObject;
 
@@ -15,8 +16,19 @@ class SwooleServer extends BaseObject
 
 
     public function run( Application $app, $host, $port, $config) {
-        $this->_app = $app;
+        // 处理热重载配置
+        if ($config['hot_reload']) {
+            $dir = $config['inotify_files'];
+            $pid = $config['pid_file'];
+            $process = new Process(function() use ($dir, $pid) {
+                SwooleServer::hotReload($dir, $pid);
+            });
+            $process->start();
+        }
+        unset($config['hot_reload']);
+        unset($config['inotify_files']);
 
+        $this->_app = $app;
         $server = new Server($host, $port);
         $server->set($config);
         $server->on('start', [$this,'onStart']);
@@ -75,5 +87,34 @@ class SwooleServer extends BaseObject
 
     public function onStart($server) {}
     public function onWorkerStart($server, $worker_id) {}
+
+    public static function hotReload($dirs, $pidFile) {
+        $events = [
+            IN_MODIFY,
+            IN_CREATE,
+            IN_DELETE
+        ];
+        $my_event = array_sum($events);
+        $ifd = inotify_init();
+        foreach ($dirs as $dir) {
+            static::inotifyAddWatchDir($ifd, $dir, $my_event);
+        }
+        stream_set_blocking($ifd, 1);
+        while ($event_list = inotify_read($ifd)) {
+            $pid = file_get_contents($pidFile);
+            exec("kill -USR1 $pid");
+        }
+    }
+
+    public static function  inotifyAddWatchDir($ifd, $dir, $event) {
+        inotify_add_watch($ifd, $dir, $event);
+        $files = scandir($dir);
+        foreach ($files as $file) {
+            $path = $dir .DIRECTORY_SEPARATOR . $file;
+            if (is_dir($path)  && $file != '.' && $file != '..') {
+                static::inotifyAddWatchDir($ifd, $path, $event);
+            }
+        }
+    }
 
 }
