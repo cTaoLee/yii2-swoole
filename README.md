@@ -11,13 +11,11 @@ require __DIR__ . '/vendor/yiisoft/yii2/Yii.php';
 
 $config = require __DIR__ . '/config/web.php';
 
-$app = new ctaolee\swoole\Application($config);
-
 $swooleConfig = [
     // ... 这里配置swoole
 ];
 $server = new ctaolee\swoole\SwooleServer();
-$server->run($app, '0.0.0.0', 9501, $swooleConfig);
+$server->run($config, '0.0.0.0', 9501, $swooleConfig);
 ```
 
 ## 热重载
@@ -35,5 +33,20 @@ $swooleConfig = [
     'pid_file' => __DIR__ . '/runtime/swoole.pid',      // pid文件位置，必须配置
     
     
+];
+```
+## Session
+只实现了 redis-session
+```php
+[
+    // ... 其他配置
+    'components' => [
+        // ... 其他配置
+         'session' => [
+            'class' => 'ctaolee\swoole\session\RedisSession',
+            'redis' => 'redis',
+            'timeout' => 3600,
+        ],
+    ]
 ];
 ```

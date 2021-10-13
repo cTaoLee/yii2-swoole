@@ -18,13 +18,23 @@ class Application extends \yii\web\Application
     public function run()
     {
         try {
-            return parent::run();
+            $code = parent::run();
+            if ($this->session->isActive)
+                $this->session->close();
+            return $code;
+        }
+        catch (\Exception $exception) {
+            $this->errorHandler->handleException($exception);
+            return 0;
         }
         catch (\Throwable $throwable) {
             $this->errorHandler->handleException($throwable);
             return 0;
         }
     }
+
+
+
 
 
     /**

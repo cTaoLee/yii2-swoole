@@ -11,26 +11,31 @@ use yii\base\BaseObject;
  */
 class SwooleServer extends BaseObject
 {
-    /* @var Application $_app */
-    private $_app;
+    private $_config;
 
+    public function run($appConfig, $host, $port, $swooleConfig) {
+        $this->_config = $appConfig;
 
-    public function run( Application $app, $host, $port, $config) {
         // 处理热重载配置
-        if ($config['hot_reload']) {
-            $dir = $config['inotify_files'];
-            $pid = $config['pid_file'];
-            $process = new Process(function() use ($dir, $pid) {
-                SwooleServer::hotReload($dir, $pid);
-            });
-            $process->start();
-        }
-        unset($config['hot_reload']);
-        unset($config['inotify_files']);
+        if ($swooleConfig['hot_reload']) {
+            $dir = $swooleConfig['inotify_files'];
+            $pid = $swooleConfig['pid_file'];
 
-        $this->_app = $app;
+            if (function_exists('inotify_init')) {
+                $process = new Process(function() use ($dir, $pid) {
+                    SwooleServer::hotReload($dir, $pid);
+                });
+                $process->start();
+            }
+            else {
+                echo "开启热重载需要 inotify 扩展支持", PHP_EOL;
+            }
+        }
+        unset($swooleConfig['hot_reload']);
+        unset($swooleConfig['inotify_files']);
+
         $server = new Server($host, $port);
-        $server->set($config);
+        $server->set($swooleConfig);
         $server->on('start', [$this,'onStart']);
         $server->on('WorkerStart', [$this,'onWorkerStart']);
         $server->on('request', [$this,'onRequest']);
@@ -42,53 +47,22 @@ class SwooleServer extends BaseObject
      *
      * @param $request
      * @param $response
+     * @throws
      */
     public function onRequest($request, $response) {
-        $this->setAppRunEnv($this->_app, $request, $response);
-        $this->_app->run();
-    }
-
-    /**
-     * 为应用设置 swoole 请求与返回
-     *
-     * @param Application $app
-     * @param \Swoole\Http\Request $request
-     * @param \Swoole\Http\Response $response
-     */
-    public function setAppRunEnv($app, $request, $response) {
+        $app = new Application($this->_config);
         $app->request->setSwRequest($request);
         $app->response->setSwResponse($response);
-
-        // 清除上个请求的数据
-        $app->request->getHeaders()->removeAll();
-        $app->response->clear();
-
-        // 设置服务器参数
-        foreach ($request->server as $k => $v) {
-            $_SERVER[strtoupper($k)] = $v;
-        }
-        foreach ($request->header as $k => $v) {
-            $_SERVER[ 'HTTP_' . strtoupper(str_replace([' ', '-'], ['_', '_'], $k))] = $v;
-        }
-
-        // 设置请求头
-        foreach ($request->header as $name => $value) {
-            $app->request->getHeaders()->set($name, $value);
-        }
-        // 设置请求参数
-        $app->request->setQueryParams($request->get);
-        $app->request->setBodyParams($request->post);
-        $rawContent = $request->rawContent() ?: null;
-        $app->request->setRawBody($rawContent);
-        // 设置路由
-        $app->request->setPathInfo($request->server['path_info']);
-
+        $app->run();
     }
+
+
 
     public function onStart($server) {}
     public function onWorkerStart($server, $worker_id) {}
 
     public static function hotReload($dirs, $pidFile) {
+
         $events = [
             IN_MODIFY,
             IN_CREATE,
